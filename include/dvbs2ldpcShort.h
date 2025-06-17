@@ -1,5 +1,4 @@
 #include "getchecknodetable.h"
-#include "nodeindices.h"
 
 double getRealRate (double rate);
 int* matrixToVector(int **matrix, int rows, int cols);
