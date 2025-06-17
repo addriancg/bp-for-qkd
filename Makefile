@@ -10,10 +10,7 @@ SRC = \
     prueba_h.c \
     src/dvbs2ldpcShort.c \
     src/matrixUtils.c \
-    src/ldpcEncoder.c \
-    src/ldpcDecoder.c \
     src/getchecknodetable.c \
-    src/nodeindices.c \
     src/crc.c
 
 # Regla principal
