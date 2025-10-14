@@ -103,6 +103,7 @@ SparseMatrix* generate_P_transpose(double rate) {
         P_t->values[i] = 1;
     }
     
+    free_matrices(&M);
     free(temp_rows);
     free(temp_cols);
     return P_t;

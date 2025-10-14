@@ -19,48 +19,59 @@ int* addcr(const int *c, const int *r, int M, int N) {
     return A;
 }
 
-SparseMatrix coo_to_csr(int num_rows,
-    int num_cols,
-    int nnz,
-    const int *coo_row,
-    const int *coo_col)
-{
-SparseMatrix A;
-A.num_rows     = num_rows;
-A.num_cols     = num_cols;
-A.num_elements = nnz;
-A.values       = NULL;  // GF(2) “1” implícito
-
-// 1) reservar
-A.row_indices = calloc(num_rows + 1, sizeof *A.row_indices);
-A.col_indices = malloc(           nnz * sizeof *A.col_indices);
-if (!A.row_indices || !A.col_indices) {
-perror("malloc CSR");
-exit(EXIT_FAILURE);
+SparseMatrix coo_to_csr(int num_rows, int num_cols, int num_elements, 
+                        const int *coo_rows, const int *coo_cols) {
+    
+    SparseMatrix csr;
+    csr.num_rows = num_rows;
+    csr.num_cols = num_cols;
+    csr.num_elements = num_elements;
+    
+    // ⭐ MALLOC para arrays CSR
+    csr.row_indices = calloc(num_rows + 1, sizeof(int));  // +1 para CSR
+    csr.col_indices = malloc(num_elements * sizeof(int));
+    csr.values = malloc(num_elements * sizeof(int));
+    
+    if (!csr.row_indices || !csr.col_indices || !csr.values) {
+        fprintf(stderr, "Error: malloc failed in coo_to_csr\n");
+        exit(1);
+    }
+    
+    // ⭐ PASO 1: Contar elementos por fila
+    for (int i = 0; i < num_elements; i++) {
+        int row = coo_rows[i];
+        if (row >= 0 && row < num_rows) {
+            csr.row_indices[row + 1]++;  // Contar en posición row+1
+        }
+    }
+    
+    // ⭐ PASO 2: Acumular para obtener índices de inicio
+    for (int row = 1; row <= num_rows; row++) {
+        csr.row_indices[row] += csr.row_indices[row - 1];
+    }
+    
+    // ⭐ PASO 3: Copiar elementos ordenados por fila
+    int *current_pos = malloc(num_rows * sizeof(int));
+    memcpy(current_pos, csr.row_indices, num_rows * sizeof(int));
+    
+    for (int i = 0; i < num_elements; i++) {
+        int row = coo_rows[i];
+        int col = coo_cols[i];
+        
+        if (row >= 0 && row < num_rows) {
+            int pos = current_pos[row];
+            csr.col_indices[pos] = col;
+            csr.values[pos] = 1;  // Valores siempre 1 para LDPC
+            current_pos[row]++;
+        }
+    }
+    
+    free(current_pos);
+    
+    printf("✅ COO→CSR: %dx%d, elementos=%d\n", num_rows, num_cols, num_elements);
+    return csr;
 }
 
-// 2) contar cantidad de 1’s por fila (desplazado +1)
-for(int k = 0; k < nnz; k++) {
-A.row_indices[ coo_row[k] + 1 ]++;
-}
-
-// 3) prefijo acumulado → row_indices
-for(int i = 0; i < num_rows; i++) {
-A.row_indices[i + 1] += A.row_indices[i];
-}
-
-// 4) rellenar col_indices
-int *next = calloc(num_rows, sizeof *next);
-if (!next) { perror("malloc next"); exit(EXIT_FAILURE); }
-for(int k = 0; k < nnz; k++) {
-int r    = coo_row[k];
-int dest = A.row_indices[r] + next[r]++;
-A.col_indices[dest] = coo_col[k];
-}
-free(next);
-
-return A;
-}
 
 
 

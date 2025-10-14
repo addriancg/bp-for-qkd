@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <string.h>
 #include "structs.h"
 
 int* addcr(const int *c, const int *r, int M, int N);

@@ -66,3 +66,21 @@ Matrices getchecknodetable(double rate)
 	}
 	return m;
 }
+
+void free_matrices(Matrices *m) {
+    // Liberar ct1
+    if (m->ct1.data) {
+        for (int i = 0; i < m->ct1.rows; i++) {
+            free(m->ct1.data[i]);
+        }
+        free(m->ct1.data);
+    }
+    
+    // Liberar ct2
+    if (m->ct2.data) {
+        for (int i = 0; i < m->ct2.rows; i++) {
+            free(m->ct2.data[i]);
+        }
+        free(m->ct2.data);
+    }
+}
