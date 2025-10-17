@@ -2,30 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "structs.h"
-
-typedef struct {
-    // Conectividad del grafo (memoria exacta)
-    int **var_to_checks;     // var_to_checks[var] = array de checks conectados
-    int **check_to_vars;     // check_to_vars[check] = array de vars conectadas
-    int *var_degrees;        // grado de cada variable
-    int *check_degrees;      // grado de cada check
-
-    int **var_to_checks_pos;
-    int **check_to_vars_pos;
-    
-    // Mensajes (memoria exacta por grado)
-    double **v2c_messages;   // v2c_messages[var] = array de mensajes a checks   ###### OPCIONAL ¿?¿?¿ se pueden calcular al vuelo (revisar)
-    double **c2v_messages;   // c2v_messages[check] = array de mensajes a vars
-    
-    // Arrays auxiliares
-    double *channel_llrs;    // LLRs del canal [n]
-    double *total_llrs;      // LLRs totales [n] 
-    int *hard_decisions;     // decisiones hard [n]
-    
-    // Dimensiones
-    int n, m;                // variables y checks
-} MinSumDecoder;
+#include "bp_decoder.h"
 
 
 void init_frame(MinSumDecoder *d, const double *Lch_in)
@@ -159,9 +136,9 @@ void decode_one_iteration_layered(MinSumDecoder *d, double alpha, double beta)
         double abs_stack[64];
         int    sgn_stack[64];
 
-        double *v2c_vals = (deg <= 64) ? v2c_vals_stack : (double*)malloc(deg*sizeof(double));
-        double *abs_vals = (deg <= 64) ? abs_stack     : (double*)malloc(deg*sizeof(double));
-        int    *sgn_vals = (deg <= 64) ? sgn_stack     : (int*)malloc(deg*sizeof(int));
+        double *v2c_vals = (double*)malloc(deg*sizeof(double));
+        double *abs_vals = (double*)malloc(deg*sizeof(double));
+        int    *sgn_vals = (int*)malloc(deg*sizeof(int));
 
         int sign_global = +1;
         double min1 = INFINITY, min2 = INFINITY;

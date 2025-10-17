@@ -192,7 +192,7 @@ SparseMatrix* concatenate_matrices(SparseMatrix *H1, SparseMatrix *H2) {
 // ═══════════════════════════════════════════════════════════════
 // Creacion matriz H
 // ═══════════════════════════════════════════════════════════════
-LDPCCode dvbs2ldpcShort(double rate, const char *fmt) {
+LDPCCode dvbs2ldpcShort(double rate) {
     const int n = 16200;
     double Rr = getReal(rate);
     if(Rr < 0) {
