@@ -15,10 +15,10 @@
 
 // ───── utilidades ─────────────────────────────────────────────────────────
 typedef struct { int r, c; } Pair;
-static int cmp_pair(const void *a,const void *b){
+/*static int cmp_pair(const void *a,const void *b){
     const Pair *pa=a,*pb=b;
     return (pa->r!=pb->r) ? pa->r-pb->r : pa->c-pb->c;
-}
+}*/
 
 // ───── tablas de tasa ------------------------------------------------------
 static const double rates[]     ={1.0/4,1.0/3,2.0/5,1.0/2,3.0/5,2.0/3,
