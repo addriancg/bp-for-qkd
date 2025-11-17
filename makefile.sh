@@ -5,7 +5,6 @@ set -euo pipefail
 : "${CFLAGS:=-std=c11 -O3 -Wall -Wextra -Wpedantic}"
 : "${OUT:=main}"
 
-# Añade -Isrc y -Iinclude (ajusta si tus headers están en raíz)
 CPPFLAGS="-Isrc -Iinclude -I."
 
 SRC=(
@@ -19,6 +18,6 @@ SRC=(
 echo "[1/2] Compilando → $OUT"
 $CC $CFLAGS $CPPFLAGS -o "$OUT" "${SRC[@]}" -lm
 
-echo "[2/2] Ejecutando → ./$OUT"
-./"$OUT"
+echo "[2/2] Ejecutando → ./$OUT $*"
+./"$OUT" "$@"
 

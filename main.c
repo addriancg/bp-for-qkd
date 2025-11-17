@@ -24,7 +24,13 @@ static int cmp_int(const void *a, const void *b){
     return (ia > ib) - (ia < ib);
 }
 
-int main(void){
+int main(int argc, char *argv[]){
+
+    unsigned seed = 0; // valor por defecto
+    if (argc > 1) {
+        seed = (unsigned)atoi(argv[1]);
+    }
+
     // 1) Código DVB-S2 short 1/2
     LDPCCode code = dvbs2ldpcShort(1.0/2.0);
 
@@ -41,7 +47,6 @@ int main(void){
     int *flips = (int*)malloc(n_flips * sizeof(int));
     if (!flips) { fprintf(stderr,"OOM flips\n"); return 1; }
 
-    unsigned seed = 0;          // semilla fija para reproducibilidad
     generate_random_flips(code.n, n_flips, flips, seed);
     qsort(flips, n_flips, sizeof(int), cmp_int);
 
