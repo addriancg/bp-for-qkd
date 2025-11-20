@@ -63,6 +63,7 @@ Matrices getchecknodetable(double rate)
                 m.ct2.data[i][j] = ct2[i][j];
             }
         }
+
 	}else if (rate == 1.0 / 4.0){
 
 		int ct1_rows = 4, ct1_cols = 12;
@@ -417,7 +418,39 @@ Matrices getchecknodetable(double rate)
 			}
 		}
 
-	}else if (rate == 4.0 / 5.0){
+	}else if (rate == 4.0 / 5.0) {
+
+		// No hay ct1 para esta tasa
+		m.ct1.rows = 0;
+		m.ct1.cols = 0;
+		m.ct1.data = NULL;
+
+		// Definir ct2 normalmente
+		int ct2_rows = 35, ct2_cols = 3;
+		m.ct2.rows = ct2_rows;
+		m.ct2.cols = ct2_cols;
+		m.ct2.data = malloc(ct2_rows * sizeof(int *));
+		for (int i = 0; i < ct2_rows; i++) {
+			m.ct2.data[i] = malloc(ct2_cols * sizeof(int));
+		}
+
+		static int ct2[35][3] = {
+			{5, 896, 1565}, {6, 2493, 184}, {7, 212, 3210}, {8, 727, 1339},
+			{9, 3428, 612}, {0, 2663, 1947}, {1, 230, 2695}, {2, 2025, 2794},
+			{3, 3039, 283}, {4, 862, 2889}, {5, 376, 2110}, {6, 2034, 2286},
+			{7, 951, 2068}, {8, 3108, 3542}, {9, 307, 1421}, {0, 2272, 1197},
+			{1, 1800, 3280}, {2, 331, 2308}, {3, 465, 2552}, {4, 1038, 2479},
+			{5, 1383, 343}, {6, 94, 236}, {7, 2619, 121}, {8, 1497, 2774},
+			{9, 2116, 1855}, {0, 722, 1584}, {1, 2767, 1881}, {2, 2701, 1610},
+			{3, 3283, 1732}, {4, 168, 1099}, {5, 3074, 243}, {6, 3460, 945},
+			{7, 2049, 1746}, {8, 566, 1427}, {9, 3545, 1168}
+		};
+
+		for (int i = 0; i < ct2_rows; i++) {
+			for (int j = 0; j < ct2_cols; j++) {
+				m.ct2.data[i][j] = ct2[i][j];
+			}
+		}
 		
 	}else if (rate == 5.0 / 6.0){
 
