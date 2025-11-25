@@ -36,6 +36,45 @@ void freeSparseMatrix(SparseMatrix *H){
     memset(H,0,sizeof *H);
 }
 
+SparseMatrixCSR* coo_to_csr(SparseMatrix *coo){
+    int nrows = coo->num_rows;
+    int nnz = coo->num_elements;
+
+    SparseMatrixCSR *csr = malloc(sizeof(SparseMatrixCSR));
+    csr->num_rows = nrows;
+    csr->num_cols = coo->num_cols;
+    csr->num_elements = nnz;
+    csr->indptr = calloc(nrows + 1, sizeof(int));
+    csr->indices = malloc(nnz * sizeof(int));
+    csr->values = malloc(nnz * sizeof(int));
+
+    // Paso 1: contar los elementos por fila
+    for(int i = 0; i < nnz; i++) {
+        csr->indptr[coo->row_indices[i] + 1]++;
+    }
+
+    // Paso 2: acumulado para indptr
+    for(int i = 1; i <= nrows; i++) {
+        csr->indptr[i] += csr->indptr[i - 1];
+    }
+
+    // Copiar pos inicial
+    int *temp = malloc((nrows + 1) * sizeof(int));
+    memcpy(temp, csr->indptr, (nrows + 1) * sizeof(int));
+
+    // Paso 3: llenar índices y valores
+    for(int i = 0; i < nnz; i++) {
+        int r = coo->row_indices[i];
+        int dest = temp[r]++;
+        csr->indices[dest] = coo->col_indices[i];
+        csr->values[dest] = coo->values[i];
+    }
+
+    free(temp);
+    return csr;
+}
+
+
 // ───── constructor principal ──────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════
 // FUNCIÓN 1: Generar Submatriz P^T (Parte Sistemática)
