@@ -7,7 +7,7 @@ int* addcr(const int *c, const int *r, int M, int N);
 int* matrixToVector(int **matrix, int rows, int cols);
 void freeMatrix(int **matrix, int rows);
 void printMatrix(int **matriz, int rows, int cols);
-SparseMatrix coo_to_csr(int num_rows, int num_cols, int nnz, const int *coo_row, const int *coo_col);
+SparseMatrixCSR* coo_to_csr(SparseMatrix *H);
 int isSystematicForm(SparseMatrix H, int k);
 //SparseLIL csr_to_lil(const SparseMatrix *csr);
 //void free_lil(SparseLIL *lil);

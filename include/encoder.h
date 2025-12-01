@@ -4,4 +4,4 @@
 
 int* generate_random_info_bits(int length);
 int validate_codeword(const SparseMatrix *H, const int *codeword);
-int* encode_ldpc_dvbs2_short(SparseMatrix *H, int* info_bits, int k, int m);
+int* encode_ldpc_dvbs2_short(LDPCCode *code, int* info_bits);

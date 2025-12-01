@@ -10,5 +10,3 @@ SparseMatrix* concatenate_matrices(SparseMatrix *H1, SparseMatrix *H2);
 LDPCCode dvbs2ldpcShort(double rate);
 SparseMatrix makeSmallTestH();
 void freeSparseMatrix(SparseMatrix *H);
-
-SparseMatrixCSR* coo_to_csr(SparseMatrix *H);

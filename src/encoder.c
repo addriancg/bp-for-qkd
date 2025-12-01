@@ -32,8 +32,13 @@ int validate_codeword(const SparseMatrix *H, const int *codeword) {
     return 1;
 }
 
-int* encode_ldpc_dvbs2_short(SparseMatrix *H, int* info_bits, int k, int m){
-	int n = k + m;
+int* encode_ldpc_dvbs2_short(LDPCCode *code, int* info_bits){
+    int n = code->n;
+    int k = code->k;
+    int m = code->m;
+    SparseMatrix *H = &(code->H);
+
+	n = k + m;
     int *codeword = malloc(n * sizeof(int));
 	if (!codeword) {
         fprintf(stderr, "Error: malloc failed in encode_ldpc_dvbs2_short\n");
