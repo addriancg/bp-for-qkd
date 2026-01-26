@@ -8,7 +8,7 @@
 void init_frame(MinSumDecoder *d, const double *Lch_in)
 {
     // 1) Copiar LLRs del canal
-    memcpy(d->channel_llrs, Lch_in, d->n * sizeof(double));
+    memcpy(d->channel_llrs, Lch_in, d->n * sizeof(double)); //Lch_in LLRS internos del canal
 
     // 2) Inicializar LLRs totales = canal
     memcpy(d->total_llrs, d->channel_llrs, d->n * sizeof(double));
@@ -39,7 +39,11 @@ void init_frame(MinSumDecoder *d, const double *Lch_in)
     // }
 }
 
-// Construye LLRs estáticos a partir de un patrón de fiabilidad A y un set de posiciones “flip”.
+/*
+    Construye LLRs estáticos a partir de un patrón de fiabilidad A y un set de posiciones “flip”.
+    Se genera un vector de LLRs sintético para pruebas controladas del decodificador, simulando
+    un canal AWGN ideal con patrón de errores conocido.
+*/
 void make_LLRs_static(int n, double A, const int *flip_idx, int n_flips, double *Lch){
     // Todo-ceros: LLR positivo favorece 0
     for (int i = 0; i < n; i++) Lch[i] = +A;
@@ -111,6 +115,8 @@ MinSumDecoder* create_decoder(LDPCCode *code) {
         
     }
     
+    decoder->syndrome_received=NULL;
+
     free(var_counters);
     free(check_counters);
     
@@ -143,7 +149,7 @@ void decode_one_iteration_layered(MinSumDecoder *d, double alpha, double beta)
         int sign_global = +1;
         double min1 = INFINITY, min2 = INFINITY;
         int idx_min1 = -1;
-
+        
         // Primer barrido: construir v2c, signo global y min1/min2
         for (int k = 0; k < deg; k++) {
             int v = nbrs[k];
@@ -172,7 +178,13 @@ void decode_one_iteration_layered(MinSumDecoder *d, double alpha, double beta)
             int v = nbrs[k];
 
             double mag = (k == idx_min1) ? min2 : min1;
-            int sign_out = sign_global * sgn_vals[k];    // excluye al propio k
+
+            int synd_sign = +1;
+            if (d->syndrome_received != NULL) {
+                synd_sign = (d->syndrome_received[c] == 0) ? +1 : -1;
+            }
+
+            int sign_out = synd_sign * sign_global * sgn_vals[k];    // excluye al propio k
 
             double raw = alpha * (double)sign_out * mag; // alpha=1.0 => min-sum
             double old = d->c2v_messages[c][k];
@@ -218,19 +230,44 @@ int check_syndrome(const LDPCCode *code, const int *hard_bits)
     return ok;
 }
 
+int check_syndrome_match (const LDPCCode *code, const int *hard_bits, const int *syndrome_received)
+{
+    int m = code->m;
+    int ok = 1;
+    int *acc = (int*)calloc(m, sizeof(int));
+    for (int i = 0; i < code->H.num_elements; i++) {
+        int r = code->H.row_indices[i];
+        int c = code->H.col_indices[i];
+        acc[r] ^= hard_bits[c];
+    }
+    for(int r = 0; r < m; r++){
+        if ((acc[r] & 1) != (syndrome_received[r] & 1)){
+            ok = 0;
+            break;
+        }
+    }
+    free(acc);
+    return ok;
+}
+
 int decode(MinSumDecoder *d, const LDPCCode *code,
            const double *Lch_in, int max_iter,
+           const int *syndrome_received,
            double alpha, double beta)
 {
     init_frame(d, Lch_in);
 
+    d->syndrome_received = (int*)syndrome_received;
+
     for (int it = 1; it <= max_iter; ++it) {
         decode_one_iteration_layered(d, alpha, beta);
         harden(d);
-        if (check_syndrome(code, d->hard_decisions)) {
+        if (check_syndrome_match(code, d->hard_decisions, syndrome_received)) {
+            d->syndrome_received = NULL;
             return it; // éxito
         }
     }
+    d->syndrome_received = NULL;
     return -1; // no convergió en max_iter
 }
 

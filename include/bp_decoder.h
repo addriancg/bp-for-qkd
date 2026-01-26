@@ -27,6 +27,9 @@ typedef struct {
     
     // Dimensiones
     int n, m;                // variables y checks
+
+    //Sindrome
+    int *syndrome_received;
 } MinSumDecoder;
 
 
@@ -39,6 +42,7 @@ void make_LLRs_static(int n, double A, const int *flip_idx, int n_flips, double 
 int decode(MinSumDecoder *d, const LDPCCode *code, const double *Lch_in, int max_iter, double alpha, double beta);
 void harden(const MinSumDecoder *d);
 int check_syndrome(const LDPCCode *code, const int *hard_bits);
+int check_syndrome_match(const LDPCCode *code, const int *hard_bits, const int *syndrome_received);
 int sanity_check(const MinSumDecoder *d);
 
 #endif /* BP_DECODER_H */
